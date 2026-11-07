@@ -1,0 +1,9 @@
+export async function upsertUser(db, u) {
+ await db.prepare(`INSERT INTO users(telegram_id,username,first_name,last_name) VALUES(?,?,?,?) ON CONFLICT(telegram_id) DO UPDATE SET username=excluded.username,first_name=excluded.first_name,last_name=excluded.last_name,updated_at=CURRENT_TIMESTAMP`).bind(String(u.id),u.username||null,u.first_name||'',u.last_name||'').run();
+}
+export async function isAdmin(db, id) { const r=await db.prepare('SELECT role FROM admins WHERE telegram_id=? AND is_active=1').bind(String(id)).first(); return !!r; }
+export async function getSession(db,id) { return db.prepare("SELECT * FROM user_sessions WHERE telegram_id=? AND session_status='active'").bind(String(id)).first(); }
+export async function saveSession(db,id,type,step,data) { await db.prepare(`INSERT INTO user_sessions(telegram_id,form_type,current_step,draft_data,session_status) VALUES(?,?,?,?, 'active') ON CONFLICT(telegram_id) DO UPDATE SET form_type=excluded.form_type,current_step=excluded.current_step,draft_data=excluded.draft_data,session_status='active',updated_at=CURRENT_TIMESTAMP`).bind(String(id),type,step,JSON.stringify(data)).run(); }
+export async function closeSession(db,id) { await db.prepare("UPDATE user_sessions SET session_status='closed',updated_at=CURRENT_TIMESTAMP WHERE telegram_id=?").bind(String(id)).run(); }
+export async function getListing(db,code) { return db.prepare('SELECT l.*,u.username,u.first_name,ap.* FROM listings l JOIN users u ON u.telegram_id=l.seller_telegram_id LEFT JOIN account_details ap ON ap.listing_id=l.id WHERE l.ad_code=?').bind(code).first(); }
+export async function logAdmin(db,admin,id,action,oldStatus,newStatus,description='') { await db.prepare('INSERT INTO admin_logs(admin_telegram_id,listing_id,action,old_status,new_status,description) VALUES(?,?,?,?,?,?)').bind(String(admin),id,action,oldStatus,newStatus,description).run(); }

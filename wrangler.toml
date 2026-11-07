@@ -1,0 +1,26 @@
+name = "cocagahibot"
+main = "src/index.js"
+compatibility_date = "2026-11-06"
+workers_dev = true
+
+[vars]
+BOT_USERNAME = "cocagahibot"
+ADMIN_TELEGRAM_ID = "8952746307"
+ADMIN_USERNAME = "P10N33RR"
+CHANNEL_USERNAME = "cocpioneernews"
+CHANNEL_ID = "-1003841945394"
+CLAN_LINK = "https://link.clashofclans.com/fa?action=OpenClanProfile&tag=2LCP90URY"
+ACCOUNT_LISTINGS_ENABLED = "true"
+MAX_CLAN_MEMBERS = "50"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cocagahi-db"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "src/migrations"
+
+[observability]
+enabled = true
+
+[triggers]
+crons = ["*/5 * * * *"]
